@@ -16,4 +16,6 @@ namespace Samples.Specifications
 			return double.Parse(input, CultureInfo.InvariantCulture);
 		}
 	}
+
+
 }
