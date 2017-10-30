@@ -17,6 +17,8 @@ namespace HomeExercises
 
 		[TestCase(-1, 2, true)]
 		[TestCase(-1, 2, false)]
+		[TestCase(0, 2, false)]
+
 		public void TestNumberValidatorInitializationThrowsExceptions(int precision, int scale, bool onlyPositive)
 		{
 			Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive));
@@ -47,8 +49,8 @@ namespace HomeExercises
 		[TestCase(3, 2, false, "-0.00")]
 		[TestCase(3, 2, true, "+0.00")]
 		[TestCase(3, 2, true, "+1.23")]
-		[TestCase(10, 0, true, "00000000000")]
-		[TestCase(10, 0, false, "-0000000000")]
+		[TestCase(4, 0, true, "00000")]
+		[TestCase(4, 0, false, "-0000")]
 		[TestCase(3, 2, false, "-1.23")]
 		public void TestCheckingInvalidPrecision(int precision, int scale, bool onlyPositive, string valueToCheck)
 		{
