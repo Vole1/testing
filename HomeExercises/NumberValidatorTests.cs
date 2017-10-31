@@ -8,20 +8,39 @@ namespace HomeExercises
 	[TestFixture]
 	public class NumberValidatorTests
 	{
-
 		[TestCase(1, 0, true)]
 		public void TestValidInitializationOfNumberValidator(int precision, int scale, bool onlyPositive)
 		{
 			Assert.DoesNotThrow(() => new NumberValidator(precision, scale, onlyPositive));
 		}
 
-		[TestCase(-1, 2, true)]
-		[TestCase(-1, 2, false)]
-		[TestCase(0, 2, false)]
-
+		[TestCase(-1, 2, true, TestName = "Negative precision with false Positive Flag")]
+		[TestCase(-1, 2, false, TestName = "Negative precision with true positive flag")]
+		[TestCase(0, 2, false, TestName = "Zero precision")]
+		[TestCase(1, -2, false, TestName = "Negative scale with true positive flag")]
+		[TestCase(2, 4, false, TestName = "precision < than scale")]
 		public void TestNumberValidatorInitializationThrowsExceptions(int precision, int scale, bool onlyPositive)
 		{
 			Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive));
+		}
+
+		[TestCase(2, 0, false, "-0", TestName = "Negetive Zero")]
+		public void TestCheckingValidNumbers(int precision, int scale, bool onlyPositive, string valueToCheck)
+		{
+			new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck).Should().BeTrue();
+		}
+
+
+		[TestCase(1, 0, true, "", TestName = "Empty number")]
+		[TestCase(1, 0, true, "-", TestName = "Empty negative number")]
+		[TestCase(3, 2, true, "a.sd", TestName = "Chars instead digits")]
+		[TestCase(4, 2, false, "-v.nt", TestName = "Chars intsad digits with minus")]
+		[TestCase(3, 2, true, "3.k", TestName = "Chars in decimal part")]
+		[TestCase(4, 2, true, "2a.85", TestName = "Chars in int part")]
+		[TestCase(5, 2, false, "-2a.85", TestName = "Chars in int part with minus")]
+		public void TestCheckingInvalidNumbers(int precision, int scale, bool onlyPositive, string valueToCheck)
+		{
+			new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck).Should().BeFalse();
 		}
 
 		[TestCase(17, 2, false, "0.0")]
@@ -33,19 +52,15 @@ namespace HomeExercises
 			Assert.IsTrue(new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck));
 		}
 
-		[TestCase(1, 0, true, "")]
-		[TestCase(3, 2, true, "a.sd")]
-		[TestCase(4, 2, false, "-v.nt")]
-		[TestCase(3, 2, true, "3.k")]
-		[TestCase(4, 2, true, "2a.85")]
-		[TestCase(5, 2, false, "-2a.85")]
-		public void TestCheckingInvalidNumbers(int precision, int scale, bool onlyPositive, string valueToCheck)
-		{
-			new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck).Should().BeFalse();
-		}
-
-
 		[TestCase(3, 2, true, "00.00")]
+		[TestCase(3, 2, true, null)]
+		[TestCase(3, 2, false, null)]
+		[TestCase(3, 2, false, ".05")]
+		[TestCase(4, 3, true, ".-05")]
+		[TestCase(4, 1, true, "-05.")]
+		[TestCase(3, 1, false, "05.")]
+		[TestCase(5, 3, false, "0.5.4")]
+		[TestCase(6, 1, true, "-0 7.1")]
 		[TestCase(3, 2, false, "-0.00")]
 		[TestCase(3, 2, true, "+0.00")]
 		[TestCase(3, 2, true, "+1.23")]
@@ -74,10 +89,10 @@ namespace HomeExercises
 			new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck).Should().BeFalse();
 		}
 
-		[TestCase(5, 2, false, "-00.00")]
-		[TestCase(3, 1, true, "+0.0")]
-		[TestCase(3, 0, true, "+12")]
-		[TestCase(2, 0, false, "-0")]
+		[TestCase(5, 2, false, "-00.00", TestName = "false flag with negative number")]
+		[TestCase(3, 1, true, "+0.0", TestName = "true flag with positive number")]
+		[TestCase(3, 0, true, "+12", TestName = "true flag With positive number")]
+		[TestCase(2, 0, false, "-0", TestName = "false flag With negative number")]
 		public void TestCheckingValidPositiveFlag(int precision, int scale, bool onlyPositive, string valueToCheck)
 		{
 			new NumberValidator(precision, scale, onlyPositive).IsValidNumber(valueToCheck).Should().BeTrue();

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 using NUnit.Framework;
 
 namespace HomeExercises
@@ -17,7 +19,7 @@ namespace HomeExercises
 
 			// Перепишите код на использование Fluent Assertions.
 
-			actualTsar.ShouldBeEquivalentTo(expectedTsar, options => options.Excluding(tsar => tsar.Id).Excluding(tsar => tsar.Parent.Id));
+			actualTsar.ShouldBeEquivalentTo(expectedTsar, options => options.Excluding(tsar => tsar.SelectedMemberPath.Contains("Id")));
 		}
 
 
@@ -32,7 +34,7 @@ namespace HomeExercises
 			// Какие недостатки у такого подхода? 
 			Assert.True(AreEqual(actualTsar, expectedTsar));
 
-        // Без прохождения отладчиком невозможно установить, сколько "тестов" не прошло, и какие конкретно "тесты" сломались, низкая расширяемость.
+		// Без прохождения отладчиком невозможно установить, сколько "тестов" не прошло, и какие конкретно "тесты" сломались, низкая расширяемость.
 		}
 
 		private bool AreEqual(Person actual, Person expected)
